@@ -1,0 +1,64 @@
+{% extends 'films/base.html' %}
+
+{% block title %}Удалить фильм - Фильмы{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card shadow border-danger">
+            <div class="card-header bg-danger text-white">
+                <h2 class="h4 mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Подтверждение удаления
+                </h2>
+            </div>
+            
+            <div class="card-body">
+                <div class="alert alert-warning" role="alert">
+                    <i class="bi bi-exclamation-triangle-fill"></i>
+                    <strong>Внимание!</strong> Вы собираетесь удалить фильм. 
+                    Это действие нельзя отменить.
+                </div>
+                
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary">
+                            <i class="bi bi-film"></i> {{ film.title }}
+                        </h5>
+                        
+                        <p class="card-text">
+                            <strong>Описание:</strong><br>
+                            {{ film.description }}
+                        </p>
+                        
+                        <p class="card-text">
+                            <strong>Отзыв:</strong><br>
+                            {{ film.get_short_review }}
+                        </p>
+                        
+                        <p class="text-muted small">
+                            <i class="bi bi-calendar"></i> 
+                            Создан: {{ film.created_at|date:"d.m.Y H:i" }}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card-footer bg-transparent">
+                <form method="post" class="d-flex justify-content-between">
+                    {% csrf_token %}
+                    
+                    <a href="{% url 'films:film_detail' film.pk %}" 
+                       class="btn btn-secondary"
+                       aria-label="Отменить удаление и вернуться к фильму {{ film.title }}">
+                        <i class="bi bi-arrow-left"></i> Отмена
+                    </a>
+                    
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Да, удалить фильм
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

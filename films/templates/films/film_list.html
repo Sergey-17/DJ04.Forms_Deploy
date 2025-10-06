@@ -1,0 +1,132 @@
+{% extends 'films/base.html' %}
+
+{% block title %}Все фильмы - Фильмы{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h2">
+                <i class="bi bi-film"></i> Фильмы
+            </h1>
+            <a href="{% url 'films:film_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-circle"></i> Добавить фильм
+            </a>
+        </div>
+
+        {% if films %}
+            <div class="row">
+                {% for film in films %}
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="card h-100 shadow-sm">
+                            <div class="card-body">
+                                <h5 class="card-title text-primary">
+                                    <i class="bi bi-film"></i> {{ film.title }}
+                                </h5>
+                                
+                                <p class="card-text text-muted small">
+                                    <i class="bi bi-calendar"></i> 
+                                    {{ film.created_at|date:"d.m.Y H:i" }}
+                                </p>
+                                
+                                <p class="card-text">
+                                    <strong>Описание:</strong><br>
+                                    {{ film.get_short_description }}
+                                </p>
+                                
+                                <p class="card-text">
+                                    <strong>Отзыв:</strong><br>
+                                    {{ film.get_short_review }}
+                                </p>
+                            </div>
+                            
+                            <div class="card-footer bg-transparent">
+                                <div class="d-flex justify-content-between">
+                                    <a href="{% url 'films:film_detail' film.pk %}" 
+                                       class="btn btn-outline-primary btn-sm">
+                                        <i class="bi bi-eye"></i> Подробнее
+                                    </a>
+                                    
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'films:film_edit' film.pk %}" 
+                                           class="btn btn-outline-secondary btn-sm"
+                                           title="Редактировать фильм" aria-label="Редактировать фильм">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'films:film_delete' film.pk %}" 
+                                           class="btn btn-outline-danger btn-sm"
+                                           title="Удалить фильм" aria-label="Удалить фильм">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Пагинация -->
+            {% if films.has_other_pages %}
+                <nav aria-label="Навигация по страницам">
+                    <ul class="pagination justify-content-center">
+                        {% if films.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                                   title="Первая страница" aria-label="Первая страница">
+                                    <i class="bi bi-chevron-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ films.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                                   title="Предыдущая страница" aria-label="Предыдущая страница">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        {% for num in films.paginator.page_range %}
+                            {% if films.number == num %}
+                                <li class="page-item active">
+                                    <span class="page-link">{{ num }}</span>
+                                </li>
+                            {% elif num > films.number|add:'-3' and num < films.number|add:'3' %}
+                                <li class="page-item">
+                                    <a class="page-link" href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">{{ num }}</a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% if films.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ films.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                                   title="Следующая страница" aria-label="Следующая страница">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ films.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}"
+                                   title="Последняя страница" aria-label="Последняя страница">
+                                    <i class="bi bi-chevron-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+
+        {% else %}
+            <div class="text-center py-5">
+                <div class="mb-4">
+                    <i class="bi bi-film display-1 text-muted"></i>
+                </div>
+                <h3 class="text-muted">Фильмов пока нет</h3>
+                <p class="text-muted">Станьте первым, кто добавит фильм!</p>
+                <a href="{% url 'films:film_create' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-plus-circle"></i> Добавить первый фильм
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

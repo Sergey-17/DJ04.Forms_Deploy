@@ -1,0 +1,128 @@
+{% extends 'films/base.html' %}
+
+{% block title %}{{ title }} - Фильмы{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="h4 mb-0">
+                    <i class="bi bi-pencil-square"></i> {{ title }}
+                </h2>
+            </div>
+            
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.title.id_for_label }}" class="form-label">
+                            <i class="bi bi-film"></i> {{ form.title.label }}
+                        </label>
+                        {{ form.title }}
+                        {% if form.title.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.title.errors %}
+                                    <div><i class="bi bi-exclamation-triangle"></i> {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            Максимум 200 символов. Осталось: <span id="title-count">200</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="{{ form.description.id_for_label }}" class="form-label">
+                            <i class="bi bi-info-circle"></i> {{ form.description.label }}
+                        </label>
+                        {{ form.description }}
+                        {% if form.description.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.description.errors %}
+                                    <div><i class="bi bi-exclamation-triangle"></i> {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            Максимум 250 символов. Осталось: <span id="description-count">250</span>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="{{ form.review_text.id_for_label }}" class="form-label">
+                            <i class="bi bi-chat-quote"></i> {{ form.review_text.label }}
+                        </label>
+                        {{ form.review_text }}
+                        {% if form.review_text.errors %}
+                            <div class="text-danger small mt-1">
+                                {% for error in form.review_text.errors %}
+                                    <div><i class="bi bi-exclamation-triangle"></i> {{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                        <div class="form-text">
+                            Минимум 20 символов. Осталось: <span id="review-count">0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between">
+                        <a href="{% if film %}{% url 'films:film_detail' film.pk %}{% else %}{% url 'films:film_list' %}{% endif %}" 
+                           class="btn btn-secondary"
+                           aria-label="Отменить редактирование и вернуться {% if film %}к фильму{% else %}к списку фильмов{% endif %}">
+                            <i class="bi bi-arrow-left"></i> Отмена
+                        </a>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> 
+                            {% if film %}Обновить фильм{% else %}Добавить фильм{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Счетчик символов для названия фильма
+    const titleInput = document.getElementById('{{ form.title.id_for_label }}');
+    const titleCount = document.getElementById('title-count');
+    
+    titleInput.addEventListener('input', function() {
+        const remaining = 200 - this.value.length;
+        titleCount.textContent = remaining;
+        titleCount.className = remaining < 0 ? 'text-danger' : 'text-muted';
+    });
+    
+    // Счетчик символов для описания
+    const descriptionInput = document.getElementById('{{ form.description.id_for_label }}');
+    const descriptionCount = document.getElementById('description-count');
+    
+    descriptionInput.addEventListener('input', function() {
+        const remaining = 250 - this.value.length;
+        descriptionCount.textContent = remaining;
+        descriptionCount.className = remaining < 0 ? 'text-danger' : 'text-muted';
+    });
+    
+    // Счетчик символов для отзыва
+    const reviewInput = document.getElementById('{{ form.review_text.id_for_label }}');
+    const reviewCount = document.getElementById('review-count');
+    
+    reviewInput.addEventListener('input', function() {
+        const length = this.value.length;
+        reviewCount.textContent = length;
+        reviewCount.className = length < 20 ? 'text-danger' : 'text-success';
+    });
+    
+    // Инициализация счетчиков
+    titleInput.dispatchEvent(new Event('input'));
+    descriptionInput.dispatchEvent(new Event('input'));
+    reviewInput.dispatchEvent(new Event('input'));
+});
+</script>
+{% endblock %}
